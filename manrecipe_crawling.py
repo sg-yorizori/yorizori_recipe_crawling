@@ -14,8 +14,8 @@ def Recipe(url):
     title = []
     main_image = []
 
-    source_name = []
-    source_amount = []
+    ingred_name = []
+    ingred_amount = []
 
     recipe_step = []
     recipe_image = []
@@ -34,10 +34,8 @@ def Recipe(url):
     for image in images:
         image_url = image["src"]
         main_image.append(image_url)
-    if len(main_image) == 1:
-        main_image = main_image[0]
 
-    # Source_name
+    # Ingred_name
     b_ = soup.find_all("b", attrs={"class": "ready_ingre3_tt"})
     try:
         for b in b_:
@@ -45,17 +43,17 @@ def Recipe(url):
             for ingre in ingre_list:
                 name = ingre.li.get_text()
                 split_name = name.split(" ", 1)
-                source_name.append(split_name[0])
+                ingred_name.append(split_name[0])
     except (AttributeError):
         return
 
-    # Source_amount
+    # Ingred_amount
     b_ = soup.find_all("b", attrs={"class": "ready_ingre3_tt"})
     try:
         for b in b_:
             ingre_list = b.find_next_siblings("a")
             for ingre in ingre_list:
-                source_amount.append(ingre.li.span.get_text())
+                ingred_amount.append(ingre.li.span.get_text())
     except (AttributeError):
         return
 
@@ -81,11 +79,10 @@ def Recipe(url):
 
     # Views
     res = soup.find('div', 'view_cate_num')
-    # views.append(res.get_text())
     views = int(res.get_text().replace(',', ''))
 
-    if recipe_step and source_name:
-        recipe = [title, main_image, source_name, source_amount,
+    if recipe_step and ingred_name:
+        recipe = [title, main_image, ingred_name, ingred_amount,
                   recipe_step, recipe_image, views, writer]
     else:
         recipe = []
@@ -127,8 +124,8 @@ def save_as_file(result, json_file, csv_file, is_header):
         tem = dict()
         tem["title"] = recipe[0][0]
         tem["main_image"] = recipe[1]
-        tem["source_name"] = recipe[2]
-        tem["source_amount"] = recipe[3]
+        tem["ingred_name"] = recipe[2]
+        tem["ingred_amount"] = recipe[3]
         tem["recipe_step"] = recipe[4]
         tem["recipe_image"] = recipe[5]
         tem["views"] = recipe[6]
