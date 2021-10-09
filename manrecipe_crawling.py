@@ -12,11 +12,11 @@ def Recipe(url):
     soup = BeautifulSoup(res.text, "lxml")
 
     title = []
-    main_image = []
+    # thumb = []
 
     ingred_name = []
     ingred_amount = []
-
+    
     recipe_step = []
     recipe_image = []
 
@@ -30,10 +30,11 @@ def Recipe(url):
     title.append(res.get_text())
 
     # Main_Image
+    thumb = ''
     images = soup.find_all("img", attrs={"id": "main_thumbs"})
     for image in images:
         image_url = image["src"]
-        main_image.append(image_url)
+        thumb = image_url
 
     # Ingred_name
     b_ = soup.find_all("b", attrs={"class": "ready_ingre3_tt"})
@@ -81,9 +82,50 @@ def Recipe(url):
     res = soup.find('div', 'view_cate_num')
     views = int(res.get_text().replace(',', ''))
 
+
+    # *** Added *** ingredient_tit
+   # ingredients
+    ingredients = []
+    b_ = soup.find_all("b", attrs={"class": "ready_ingre3_tt"})
+    try:
+        for b in b_:
+            ingre_list = b.find_next_siblings("a")
+            for ingre in ingre_list:
+                tem = []
+                name = ingre.li.get_text()
+                split_name = name.split("   ", 1)
+                tem.append(split_name[0])
+                tem.append(ingre.li.span.get_text())
+                ingredients.append(tem)
+    except (AttributeError):
+        return
+
+    # Steps
+    steps  = []
+    res = soup.find('div', 'view_step')
+    i = 0
+    for n in res.find_all('div', 'view_step_cont'):
+        i = i + 1
+        tem = []
+        tem.append(str(i))
+        tem.append(n.get_text().replace('\n', '\n\n'))
+
+        img = n.find("img")
+        if img != None:
+            img_src = img.get("src")
+        else:
+            img_src = ''
+        tem.append(img_src)
+        steps.append(tem)
+
+    # writer
+    writer = int(0)
+
     if recipe_step and ingred_name:
-        recipe = [title, main_image, ingred_name, ingred_amount,
-                  recipe_step, recipe_image, views, writer]
+        recipe = [title, thumb, writer, ingredients,
+                  steps, views]
+        # recipe = [title, thumb, ingred_name, ingred_amount,
+        #           recipe_step, recipe_image, views, writer]
     else:
         recipe = []
 
@@ -123,13 +165,12 @@ def save_as_file(result, json_file, csv_file, is_header):
     for recipe in result:
         tem = dict()
         tem["title"] = recipe[0][0]
-        tem["main_image"] = recipe[1]
-        tem["ingred_name"] = recipe[2]
-        tem["ingred_amount"] = recipe[3]
-        tem["recipe_step"] = recipe[4]
-        tem["recipe_image"] = recipe[5]
-        tem["views"] = recipe[6]
-        tem["writer"] = recipe[7]
+        tem["thumb"] = recipe[1]
+        tem["writer"] = recipe[2]
+        tem["ingredients"] = recipe[3]
+        tem["steps"] = recipe[4]
+        tem["views"] = recipe[5]
+        
         data[str(index)] = tem
         index += 1
 
@@ -146,8 +187,9 @@ def save_as_file(result, json_file, csv_file, is_header):
 
 
 if __name__ == "__main__":
-    food_list = ["마늘", "양상추", "단호박", "아보카도", "쪽파", "달걀", "양파", "토마토", "당근",
-                 "콩나물", "감자", "소세지", "두부", "파프리카", "새송이버섯", "오렌지", "무"]
+    # food_list = ["마늘", "양상추", "단호박", "아보카도", "쪽파", "달걀", "양파", "토마토", "당근",
+    #              "콩나물", "감자", "소세지", "두부", "파프리카", "새송이버섯", "오렌지", "무"]
+    food_list = ["봄동"]
 
     json_file = open("recipe.json", "w", encoding="utf8")
     csv_file = open("recipe.csv", "w", encoding="utf-8-sig", newline='')
