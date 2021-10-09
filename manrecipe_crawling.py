@@ -12,7 +12,7 @@ def Recipe(url):
     soup = BeautifulSoup(res.text, "lxml")
 
     title = []
-    thumb = []
+    # thumb = []
 
     ingred_name = []
     ingred_amount = []
@@ -30,10 +30,11 @@ def Recipe(url):
     title.append(res.get_text())
 
     # Main_Image
+    thumb = ''
     images = soup.find_all("img", attrs={"id": "main_thumbs"})
     for image in images:
         image_url = image["src"]
-        thumb.append(image_url)
+        thumb = image_url
 
     # Ingred_name
     b_ = soup.find_all("b", attrs={"class": "ready_ingre3_tt"})
@@ -82,8 +83,8 @@ def Recipe(url):
     views = int(res.get_text().replace(',', ''))
 
 
-    # *** Added *** 
-    # ingredients
+    # *** Added *** ingredient_tit
+   # ingredients
     ingredients = []
     b_ = soup.find_all("b", attrs={"class": "ready_ingre3_tt"})
     try:
@@ -92,7 +93,7 @@ def Recipe(url):
             for ingre in ingre_list:
                 tem = []
                 name = ingre.li.get_text()
-                split_name = name.split(" ", 1)
+                split_name = name.split("   ", 1)
                 tem.append(split_name[0])
                 tem.append(ingre.li.span.get_text())
                 ingredients.append(tem)
@@ -188,7 +189,7 @@ def save_as_file(result, json_file, csv_file, is_header):
 if __name__ == "__main__":
     # food_list = ["마늘", "양상추", "단호박", "아보카도", "쪽파", "달걀", "양파", "토마토", "당근",
     #              "콩나물", "감자", "소세지", "두부", "파프리카", "새송이버섯", "오렌지", "무"]
-    food_list = ["마늘"]
+    food_list = ["봄동"]
 
     json_file = open("recipe.json", "w", encoding="utf8")
     csv_file = open("recipe.csv", "w", encoding="utf-8-sig", newline='')
