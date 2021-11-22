@@ -24,6 +24,8 @@ def Recipe(url):
 
     writer = ''
 
+    created_date = ''
+
     # Title
     res = soup.find('div', 'view2_summary')
     res = res.find('h3')
@@ -121,9 +123,14 @@ def Recipe(url):
     # writer
     writer = int(0)
 
+    # Created Date
+    res = soup.find('p', 'view_notice_date')
+    res = res.find('b')
+    created_date = (res.get_text().replace('등록일 : ', ''))
+
     if recipe_step and ingred_name:
         recipe = [title, thumb, writer, ingredients,
-                  steps, views]
+                  steps, views, created_date]
         # recipe = [title, thumb, ingred_name, ingred_amount,
         #           recipe_step, recipe_image, views, writer]
     else:
@@ -170,6 +177,7 @@ def save_as_file(result, json_file, csv_file, is_header):
         tem["ingredients"] = recipe[3]
         tem["steps"] = recipe[4]
         tem["views"] = recipe[5]
+        tem["created_date"] = recipe[6]
         
         data[str(index)] = tem
         index += 1
